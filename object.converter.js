@@ -1,60 +1,58 @@
-
 /**
  * Created by PhucTran on 12/19/2015.
  */
 
 "use strict";
 
-var objectCollection = null;
+var objectCollection = [];
 var index = -1;
 var validField = {
     accessModifier : "accessModifier",
     name: "name",
     dataType: "dataType",
-    propertyNames: "propertyNames"
+    propertyNames: "propertyNames",
+    refTable : "refTable"
 };
 var pLanguageSetting = null;
 
-function createObject(jsonSting,language,setting) {
-    var jsonString1 = '{"glossary":{"title":"example glossary","GlossDiv":{"title":false,"GlossList":{"GlossEntry":{"ID":"SGML","SortAs":"SGML","GlossTerm":"Standard Generalized Markup Language","Acronym":"SGML","Abbrev":"ISO 8879:1986","GlossDef":{"para":"A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso":["GML","XML"]},"GlossSee":"markup"}}}},"test":"funny"}';
-    var jsonString2 = '[{"title":"title 1"}, {"title":"title 2"}]';
-    var jsonString3 = '{"myarray":[{"value":0,"label":0},{"value":1,"label":1},{"value":2,"label":2},{"value":3,"label":3},{"value":4,"label":4},{"value":5,"label":5},{"value":6,"label":6},{"value":7,"label":7},{"value":8,"label":8},{"value":9,"label":9}]}';
-    var jsonString4 = '{"myarray":[{"value":0,"label":0},{"value":1,"label":1},{"value":2,"label":2},{"value":3,"label":3},{"value":4,"label":4},{"value":5,"label":5},{"value":6,"label":6},{"value":7,"label":7},{"value":8,"label":8},{"value":9,"label":9}],"myarray1":[{"value":0,"label":0},{"value":1,"label":1},{"value":2,"label":2},{"value":3,"label":3},{"value":4,"label":4},{"value":5,"label":5},{"value":6,"label":6},{"value":7,"label":7},{"value":8,"label":8},{"value":9,"label":9}]}';
-    var jsonString5 = '{"myarray":[{"value":0,"label":0},{"value":1,"label":1},{"value":2,"label":2,"myarray":{"value":2,"label":2}},{"value":3,"label":3},{"value":4,"label":4},{"value":5,"label":5},{"value":6,"label":6},{"value":7,"label":7},{"value":8,"label":8},{"value":9,"label":9}],"myarray1":[{"value":0,"label":0},{"value":1,"label":1},{"value":2,"label":2},{"value":3,"label":3},{"value":4,"label":4},{"value":5,"label":5},{"value":6,"label":6},{"value":7,"label":7},{"value":8,"label":8},{"value":9,"label":9}]}';
-    var jsonString6 = '{"myarray":[{"value":0,"label":0},{"value":1,"label":1},{"value":2,"label":2},{"value":3,"label":3},{"value":4,"label":4},{"value":5,"label":5},{"value":6,"label":6},{"value":7,"label":7},{"value":8,"label":8},{"value":9,"label":9}],"myarray1":[{"value":0,"label":0},{"value":1,"label":1},{"value":2,"label":2},{"value":3,"label":3},{"value":4,"label":4},{"value":5,"label":5},{"value":6,"label":6},{"value1":7,"label":7},{"value":8,"label":8},{"value":9,"label":9}]}';
-    var jsonString7 = '[{"a":"B","c":"D"},{"B":"D"}]';
-    var jsonString8 = '[{"a":"B","c":"D"},{"a":"B","c":"D"}]';
-    var jsonString9 = '{"accounting":[{"firstName":"John","lastName":"Doe","age":23},{"firstName":"Mary","lastName":"Smith","age":32}],"sales":[{"firstName":"Sally","lastName":"Green","age":27},{"firstName":"Jim","lastName":"Galley","age":41}]}';
-    var jsonString10 = '{"myarray":[{"value":0,"label":0},{"value":2,"label":2,"myarray":{"value":2,"label":2}}]}';
-    var jsonString11 = '{"problems":[{"Diabetes":[{"medications":[{"medicationsClasses":[{"className":[{"associatedDrug":[{"name":"asprin","dose":"","strength":"500 mg"}],"associatedDrug#2":[{"name":"somethingElse","dose":"","strength":"500 mg"}]}],"className2":[{"associatedDrug":[{"name":"asprin","dose":"","strength":"500 mg"}],"associatedDrug#2":[{"name":"somethingElse","dose":"","strength":"500 mg"}]}]}]}],"labs":[{"missing_field":"missing_value"}]}],"Asthma":[{}]}]}';
-    var jsonString12 = '{"problems":[{"Diabetes":[{"medications":[{"medicationsClasses":[{"className":[{"associatedDrug":[{"name":"asprin","dose":"","strength":"500 mg"}],"associatedDrug#2":[{"name":"somethingElse","dose":"","strength":"500 mg"}]}],"className2":[{"associatedDrug":[{"name":"asprin","dose":"","strength":"500 mg"}],"associatedDrug#3":[{"name":"somethingElse","dose":"","strength":"500 mg"}]}]}]}],"labs":[{"missing_field":"missing_value"}]}],"Asthma":[{}]}]}';
-    var jsonString13 = '{"problems":[{"Diabetes":[{"medications":[{"medicationsClasses":[{"className":[{"associatedDrug":[{"name":"asprin","dose":"","strength":"500 mg"}],"associatedDrug#2":[{"name":"somethingElse","dose":"","strength":"500 mg"}]}],"className2":[{"associatedDrug4":[{"name":"asprin","dose":"","strength":"500 mg"}],"associatedDrug#3":[{"name":"somethingElse","dose":"","strength":"500 mg"}]}]}]}],"labs":[{"missing_field":"missing_value"}]}],"Asthma":[{}]}]}';
-    var jsonString14 = '{"problems": {"a" : "abc","problems" : {"d" : "e"}}}';
+
+var exampleJson =  {
+	"J01" : '{"id":690752021,"age":"23","name":"srinivas","blog":"http://blog.sodhanalibrary.com","messages":[{"msgid":"1","msg":"message 1"},{"msgid":"2","msg":"message 2"}]}'
+};
+
+function createObject(jsonSting,language,customSetting) {
     objectCollection = [];
     index = -1;
-    if(!setting)
-    {
-        pLanguageSetting = outputLanguageSetting[language];
-    }
-    else{
-        pLanguageSetting = setting;
-    }
-    var status = true;
-    var message = "";
-    if(!dataStructure.json.isValid(jsonSting)) {
-        status = false;
-        message = "Invalid json string";
-    }
-    if(!pLanguageSetting) {
-        status = false;
-        message = "Invalid programming language";
-    }
-    if(status){
-        parse({rootObject: dataStructure.json.toObject(jsonSting)});
+	var status = true;
+
+	// check if have custom setting
+	// if have custom setting we will use it
+	// if don't have custom setting we will use default setting
+	customSetting ? pLanguageSetting = customSetting 
+	              : pLanguageSetting = outputLanguageSetting[language];
+	
+	// check valid json and setting 	
+	var message =  !dataStructure.json.isValid(jsonSting) ? "Invalid json string"	
+					: !pLanguageSetting ? "Invalid programming language" : "";
+	
+    if(!message){
+		// parse json to javascript object
+        var object = dataStructure.json.toObject(jsonSting);
+		
+		// SQL don't need rootObject (outer most class)
+		object =  !pLanguageSetting['isSQL'] ?  {rootObject: object} : object;
+		
+		// by default, SQL table doesn't need rootObject
+		// but we still need rootObject if json string doesn't have parent 
+		// ex: exampleJson['J01'] - id , age , name , blog properties don't have parent.
+		// if parse(object) return false , it will need an outer most class named rootObject.
+        if(parse(object) == false){
+			parse({rootObject: object});
+		}
         message = pattern.execute();
     }
     return {
-        status : status,
+        status : !!message,
         message : message
     }
 }
@@ -62,24 +60,67 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function getMatchIndices(regex, str) {
+    var result = [];
+    var match;
+    regex = new RegExp(regex);
+    while (match = regex.exec(str))
+        result.push(match.index);
+    return result;
+}
+
 var pattern = {
     "execute": function () {
         var objects = objectCollectionHelper.getObjectCollection();
         var outputs = "";
+        var codeRegex = /\${([\S\s]*)}/g;
+        var codeMatches = [] ;
+        var codeFound;
+		if(pLanguageSetting.isSQL)
+			objectCollectionHelper.sqlReorder();
+		
         for (var j = 0; j < objects.length; j++) {
             var object = objects[j];
             if (object.isHide)continue;
             var output = pLanguageSetting.structure.body;
-
             var properties = object.properties;
+			var totalForeign = 0;
+			var totalPrimary = 0;
+			var totalKey = 0;
+			var oTotalKey  = object.totalForeign + object.totalPrimary;
             var stringPropertyName = "";
+			var hasForeign = false;
             for (var z = 0; z < properties.length; z++) {
                 var nextPropertySign = "";
+				var isLastProp = (z == (properties.length - 1)) ? true : false;
                 if (z < (properties.length - 1)) {
                     nextPropertySign = pLanguageSetting.structure.propertySign;
                 }
                 output = output.replace("@property", pLanguageSetting.structure.property + nextPropertySign);
                 var property = properties[z];
+				
+                if(pLanguageSetting.structure.primary){
+                    if(property.isPrimary){
+						totalKey++;
+						var primaryPart = pLanguageSetting.structure.primary;
+						if(totalKey == oTotalKey && !hasForeign){
+							primaryPart = primaryPart.substring(0, primaryPart.length - 1);
+						}
+                        output = output.replace("@primary",primaryPart);
+                    }
+                }
+                if(pLanguageSetting.structure.foreigns){
+                    if(property.isForeign){
+						totalKey++;
+						var foreignPart = pLanguageSetting.structure.foreigns;
+						if(totalKey == oTotalKey)
+						{
+							foreignPart = foreignPart.substring(0, foreignPart.length - 1);
+						}
+							
+                        output = output.replace("@foreigns",foreignPart  + "@foreigns");
+                    }
+                }
 
                 for (var propKey in property) {
                     if (property.hasOwnProperty(propKey)) {
@@ -96,13 +137,17 @@ var pattern = {
                                     if (property.isArray) {
                                         value = new Function('property', pLanguageSetting.dataType["array"])(cloneObject(property));
                                     }
-                                    break;
+									break;
+								
                             }
                             output = output.replace(new RegExp(validPropKey,'g'),value);
                         }
                     }
                 }
             }
+			
+            output = output.replace("@foreigns","");
+            output = output.replace("@primary","");
             object.propertyNames = stringPropertyName.substr(0,stringPropertyName.length -1);
 
             for (var key in object) {
@@ -115,12 +160,22 @@ var pattern = {
                                 objectValue = getValidName("object",objectValue);
                                 break;
                         }
-                        output = output.replace(validObKey,objectValue );
+                        output = output.replace(new RegExp(validObKey,'g'),objectValue );
                     }
                 }
             }
-            outputs += output + "\n";
-        }
+
+         //var  indices = getMatchIndices(/\${/g,pLanguageSetting.structure.body);
+        //console.log(outputs);
+        //console.log("========================");
+        /*for(var p =0; p < indices.length; p++){
+
+            var startIndex = indices[p];
+            var codeFound =  getCodeBlock(pLanguageSetting.structure.body,startIndex + 1);            
+            outputs += output.replace("$" +codeFound,eval(codeFound)) + "\n";
+        }*/
+		outputs += output + "\n";
+	}	
         if(pLanguageSetting.structure.startWrapper){
             outputs = pLanguageSetting.structure.startWrapper + outputs;
         }
@@ -131,12 +186,6 @@ var pattern = {
     }
 };
 
-/**
- * Transform name as base on  setting
- * @param type
- * @param name
- * @returns {*}
- */
 function getValidName(type,name){
     switch (type)
     {
@@ -149,53 +198,129 @@ function getValidName(type,name){
     }
 }
 
-/**
- * Recursive function to loop through all objects
- * @param obj
- * @param object
- */
-function parse(obj, object) {
-    obj = obj || {};
+function  getCodeBlock(block,startIndex ) {
+    var  currPos = startIndex,
+        openBrackets = 0,
+        stillSearching = true,
+        waitForChar = false;
+
+    while (stillSearching && currPos <= block.length) {
+        var currChar = block.charAt(currPos);
+
+        if (!waitForChar) {
+            switch (currChar) {
+                case '{':
+                    openBrackets++;
+                    break;
+                case '}':
+                    openBrackets--;
+                    break;
+                case '"':
+                case "'":
+                    waitForChar = currChar;
+                    break;
+                case '/':
+                    var nextChar = block.charAt(currPos + 1);
+                    if (nextChar === '/') {
+                        waitForChar = '\n';
+                    } else if (nextChar === '*') {
+                        waitForChar = '*/';
+                    }
+            }
+        } else {
+            if (currChar === waitForChar) {
+                if (waitForChar === '"' || waitForChar === "'") {
+                    block.charAt(currPos - 1) !== '\\' && (waitForChar = false);
+                } else {
+                    waitForChar = false;
+                }
+            } else if (currChar === '*') {
+                block.charAt(currPos + 1) === '/' && (waitForChar = false);
+            }
+        }
+
+        currPos++;
+        if (openBrackets === 0) { stillSearching = false; }
+    }
+
+    return block.substring(startIndex , currPos); // contents of the outermost brackets incl. everything inside
+
+}
+
+
+function parse(newObject, previousObject) {
+    if (!previousObject)
+        previousObject = {};
     window.index++;
     var isLoop = false;
-
-    //loop through property of current object
-    for (var property in obj) {
-        if (obj.hasOwnProperty(property)) {
-            var value = obj[property],
-                isArray = objectType.isArray(value),
-                isObject = objectType.isObject(value),
-                baseObject = null;
-
+    for (var property in newObject) {
+        if (newObject.hasOwnProperty(property)) 
+		{
+            var value = newObject[property];			
+            var isArray = objectType.isArray(value);
+            var isObject = objectType.isObject(value);
+            var baseObject = null;
             isLoop = isArray ? isArray : isObject;
-
-            if ((isObject || isArray) && !object.isArray) {
+			
+			// if current value is array or object 
+			// we will create an Object and push into object collection
+			// if parent object (previousObject) is an array 
+            if ((isObject || isArray) && !previousObject.isArray)
+			{	
+				// id: each object always have an unique object
+				// isHide: use to hide or show element
+				// isArrayObject : detect object is an array 
+				// totalForeign : in a SQL table, maybe we'll have multiple foreign key
+				// primaryForeign : in a SQL table, maybe we'll have multiple primary key
+				// name : name of object
+				// objectId : if previousObject != null => previousObject is parent object of current object
+				// properties : array of property
                 baseObject = {
                     'id': objectCollectionHelper.generateObjectId(),
                     "isHide": false,
                     "isArrayObject": true,
                     "accessModifier": "public",
-                    "name": object.isArray ? object.name : property,
+					"totalForeign" : 0,
+					"totalPrimary" : 0,
+                    "name":  property,
                     "isArray": isArray,
                     "properties": [],
-                    "objectId": object ? object.id : "",
-                    "isTemp": true
+                    "objectId": previousObject ? previousObject.id : ""
                 };
                 objectCollectionHelper.pushObject(baseObject);
             }
             else {
+				// in case SQL table, if we don't have any object in object collection
+				// we need to return false to add most outer root object like this => {rootObject: object}
+				if(objectCollectionHelper.getObjectCollection().length == 0) 
+					return false;
+				
+				// accessModifier : always public
+				// name : name of property
+				// data : value of property
+				// isPrimary : primary key of sql table , default is false
+				// isForeign : foreign key of sql table , default is false
+				// dataType : javascript build in data type of property. 
+				//            data type is determined base on value of property 
+				//            we will use this js build data to convert to another language's data type
+				// objectId :  parent object id
+				//             parent object of property is previousObject variable
                 var baseProperty = {
                     "accessModifier": "public",
                     "name": property,
                     "data": value,
+                    "isPrimary" : false,
+                    "isForeign" : false,
                     "dataType": dataType.get(value),
-                    "objectId": object.id
+                    "objectId": previousObject.id
                 };
-                if (object.isArray) {
-                    baseObject = {'id': object.id, "name": property, "isArray": isArray};
+				
+				// if parent object is an array 
+                if (previousObject.isArray) {
+                    baseObject = {'id': previousObject.id, "name": property, "isArray": isArray};
                     if (!isObject) {
-                        object.isArrayObject = false;
-                        object.isHide = true;
+                        previousObject.isArrayObject = false;
+                        previousObject.isHide = true;
                     }
                 }
 
@@ -208,22 +333,22 @@ function parse(obj, object) {
                 parse(value, baseObject);
             }
         } else {
-            console.log(property + "   " + obj[property]);
+            console.log(property + "   " + newObject[property]);
         }
     }
     window.index--;
 
     if (window.index == -1) {
-        //remove duplicate object
+        ////remove duplicate object
         var hasCodes = [];
         for (var index = 0; index < objectCollection.length; index++) {
-            object = objectCollection[index];
-            if (hasCodes.indexOf(object.hashCode) > -1) {
-                object.isHide = true;
+            previousObject = objectCollection[index];
+            if (hasCodes.indexOf(previousObject.hashCode) > -1) {
+                previousObject.isHide = true;
                 continue;
             }
-            if (!object.isHide) {
-                hasCodes.push(object.hashCode);
+            if (!previousObject.isHide) {
+                hasCodes.push(previousObject.hashCode);
             }
         }
     }
@@ -260,15 +385,31 @@ var objectCollectionHelper = {
         newObject.key = newObject.name;
         newObject.name =  objectCollectionHelper.getUniqueObjectName(newObject.name);
         objectCollection.push(newObject);
-        if (newObject.objectId) {
+        if (newObject.objectId) 
+		{	
+			// check if the programming language has reference type
+			// ex: C# , java ....
             if(pLanguageSetting.isRef)
                 newObject.dataType = newObject.name;
+            else if(pLanguageSetting.isSQL){
+				// if it's SQL , we'll set first property is primary key
+                var selectedObject = this.getObjectById(newObject.objectId);
+                var firstProperty = cloneObject(selectedObject.properties[0]);
+				newObject.totalForeign++;
+                firstProperty.objectId = newObject.id;
+                firstProperty.isForeign = true;
+                firstProperty.isPrimary = false;
+				firstProperty.refTable = selectedObject.name;
+                this.pushProperty(firstProperty);
+                return;
+            }
             else
                 newObject.dataType = new Function(pLanguageSetting.dataType["default"])();
 
             this.pushProperty(newObject);
         }
     },
+	
 
     /**
      * Push a property into an object in objectCollection
@@ -290,19 +431,31 @@ var objectCollectionHelper = {
                 else
                     selectedObject.dataType = property.dataType;
             }
+			
+			// after push a property into an object 
+			// we will update hashcode for that object
+			// hashcode is generated by combine object key and all property name in that object 
+			// hashcode will be use to remove duplicated object
             selectedObject.hashCode = selectedObject.key;
+            var isPrimary = false;
             for (var index = 0; index < selectedObject.properties.length; index++) {
                 var prop = selectedObject.properties[index];
                 selectedObject.hashCode += prop.name;
+				
+				// for sql table , we need determine primary and foreign key
+				// by default, we'll set first property is primary key
+                if(prop.isPrimary)
+                    isPrimary = prop.isPrimary;
+                if(isPrimary == false){
+                    if(!prop.isForeign){
+                        isPrimary = true;
+						selectedObject.totalPrimary++;
+                        prop.isPrimary = isPrimary;
+                    }
+                }
             }
         }
     },
-
-    /**
-     * Check property exist in a specific object
-     * @param property
-     * @returns {boolean}
-     */
     isPropertyExist: function (property) {
         var object = this.getObjectById(property.objectId);
         if (object && object.properties) {
@@ -315,7 +468,6 @@ var objectCollectionHelper = {
         }
         return false;
     },
-
     /**
      * Get all of objects in objectCollection
      * @return {Array} array of object in objectCollection
@@ -324,11 +476,6 @@ var objectCollectionHelper = {
         return objectCollection;
     },
 
-    /**
-     * Get a object form object collection by id
-     * @param objectId
-     * @returns {*}
-     */
     getObjectById: function (objectId) {
         for (var key in objectCollection) {
             if (objectCollection.hasOwnProperty(key)) {
@@ -342,11 +489,6 @@ var objectCollectionHelper = {
         return null;
     },
 
-    /**
-     * Generate a object unique name
-     * @param name
-     * @returns {*}
-     */
     getUniqueObjectName : function (name) {
         var index = 0;
         var objectLength = objectCollection.length;
@@ -361,13 +503,6 @@ var objectCollectionHelper = {
         }
         return name;
     },
-
-    /**
-     * Generate a property unique name
-     * @param name
-     * @param object
-     * @returns {*}
-     */
     getUniquePropertyName : function (name,object) {
         var index = 0;
         var propLength = object.properties.length;
@@ -381,7 +516,35 @@ var objectCollectionHelper = {
             index++;
         }
         return name;
-    }
+    },
+	
+	// generate an unique string 
+    generateObjectId: function () {
+        var u = '', m = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx', i = 0, rb = Math.random() * 0xffffffff | 0;
+        while (i++ < 36) {
+            var c = m[i - 1], r = rb & 0xf, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            u += (c == '-' || c == '4') ? c : v.toString(16);
+            rb = i % 8 == 0 ? Math.random() * 0xffffffff | 0 : rb >> 4
+        }
+        return u
+    },
+	
+	sqlReorder : function(){
+		for(var i =0; i < objectCollection.length; i++){
+			var object = objectCollection[i];
+			var primaryIndexs = [];
+			for(var z = 0; z < object.properties.length;z++){
+				var property =  object.properties[z];
+				if(property.isPrimary){
+					primaryIndexs.push(z);
+				}
+			}
+			var primaryLength = primaryIndexs.length;
+			while(primaryLength--){
+				move(object.properties,primaryIndexs[primaryLength],0);
+			}
+		}
+	}
 };
 
 // Javascript build-in data types
@@ -554,17 +717,113 @@ var outputLanguageSetting = {
         oNameConvention: textTransform.keepOriginal,
         pNameConvention: textTransform.keepOriginal
     },
-	cplus:{
+	cplusplus:{
 		dataType:{
-
+			string : "return 'string';",
+			boolean : "return 'bool';",
+			number : "return 'interger';",
+			auto : "return 'default';",
+			array : "return 'vector<'+ property.dataType +'>';"
 		},
+		isRef: true,
 		structure :{
-
-		}
+			"propertySign": "\n\t\t@property",
+            "body": "class oName \n{\n\tPublic\n\t\t@property\n}\n",
+            "property": "pDataType pName;"
+		},
+		oNameConvention: textTransform.keepOriginal,
+        pNameConvention: textTransform.keepOriginal
+	},
+	ruby :{
+		dataType:{
+			string : "return '@';",
+			boolean : "return '@';",
+			number : "return '@';",
+			auto : "return '@';",
+			array : "return '@';"
+		},
+		isRef: false,
+		structure : {
+			"propertySign": "\n\t\t@property",
+			"body": "class oName\n\tdef initialize(oPropertyNames)\n\t\t@property\n\tend\nend\n",
+			"property": "@pName = pName"
+		},
+		oNameConvention: textTransform.keepOriginal,
+        pNameConvention: textTransform.keepOriginal
+	},
+	python : {
+		dataType: {
+			string : "return '';",
+			boolean : "return '';",
+			number : "return '';",
+			auto : "return '';",
+			array : "return '';"
+		},
+		isRef: false,
+		structure : {
+			"propertySign": "\n\t\t@property",
+			"body": "class oName\n\tdef __init__(oPropertyNames)\n\t\t@property\n",
+			"property": "self.pName = pName"
+		},
+		oNameConvention: textTransform.keepOriginal,
+        pNameConvention: textTransform.keepOriginal
+	},
+	sql :{
+		dataType:{
+			string : "var length = property.data.length; \n"
+                      + "var ranges = ['50','100','250', '1000' , '3000' , '8000']; \n"
+                       + "for(var index = 0; index < ranges.length; index++){ \n"
+                             + "var range = ranges[index];\n\t"
+                             +"if(length < range){\n\t"
+                           +    "\t  return 'varchar(' + range + ')';\n\t"
+                        +   "}\n"
+                       + "};",
+			boolean : "return 'boolean';",
+			number : "return 'int';"
+		},
+		isRef: false,
+        noNeedRoot: true,
+        isSQL: true,
+		structure : {
+			"propertySign": "\n\t@property",
+			"body": "create table oName\n(\n\t@property \n\t@primary\n\t@foreigns\n );",
+			"property": "[pName] pDataType NOT NULL,",
+			"primary" : "PRIMARY KEY (pName),",
+			"foreigns" : "FOREIGN KEY (pName) REFERENCES pRefTable(pName),"
+		},
+		oNameConvention: textTransform.keepOriginal,
+        pNameConvention: textTransform.keepOriginal
+	},
+	mysql: {
+		dataType :{ 
+			string : "var length = property.data.length; \n"
+                      + "var ranges = ['50','100','250', '1000' , '3000' , '8000']; \n"
+                       + "for(var index = 0; index < ranges.length; index++){ \n"
+                             + "var range = ranges[index];\n\t"
+                             +"if(length < range){\n\t"
+                           +    "\t  return 'varchar(' + range + ')';\n\t"
+                        +   "}\n"
+                       + "}",
+			boolean : "return 'tinyint';",
+			number : "return 'int';"
+		},
+		isRef: false,
+        noNeedRoot: true,
+        isSQL: true,
+		structure : {
+			"propertySign": "\n\t@property",
+			"body": "create table oName\n(\n\t@property \n\t@primary\n\t@foreigns\n );",
+			"property": "`pName` pDataType NOT NULL,",
+			"primary" : "PRIMARY KEY (pName),",
+			"foreigns" : "FOREIGN KEY (pName) REFERENCES pRefTable(pName),"
+		},
+		oNameConvention: textTransform.keepOriginal,
+        pNameConvention: textTransform.keepOriginal
 	}
+	
 };
 
-/**
+/***
  * recursive function to clone an object. If a non object parameter
  * is passed in, that parameter is returned and no recursion occurs.
  * @param obj
@@ -602,13 +861,19 @@ var dataStructure = {
             }
             return true;
         },
-
-        /**
-         * Convert json to object
-         * @param str
-         */
         toObject: function (str) {
             return JSON.parse(str);
         }
     }
+};
+
+ function move (array,old_index, new_index) {
+    if (new_index >= array.length) {
+        var k = new_index - array.length;
+        while ((k--) + 1) {
+            array.push(undefined);
+        }
+    }
+    array.splice(new_index, 0, array.splice(old_index, 1)[0]);
+    return array; // for testing purposes
 };
